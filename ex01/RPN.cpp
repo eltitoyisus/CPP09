@@ -15,11 +15,7 @@
 RPN::RPN() {}
 
 RPN::RPN(const std::string &input) {
-	try {
 	parseInput(input);
-	} catch (std::exception &e) {
-		std::cerr << e.what() << std::endl;
-	}
 }
 
 RPN::RPN(const RPN &src) {
@@ -39,8 +35,16 @@ std::string RPN::parseInput(const std::string &input) {
 	std::string operand;
 
 	while (ss >> operand) {
-		if (operand.size() == 1 && isdigit(operand[0])) {
-			stack.push(operand[0] - '0');
+		if ((operand.size() == 1 && isdigit(operand[0])) ||
+		    ((operand[0] == '+' || operand[0] == '-') && operand.size() > 1 && isdigit(operand[1]))) {
+			std::stringstream numStream(operand);
+			int num;
+			numStream >> num;
+			
+			if (num >= 10)
+				throw std::runtime_error("Error: Positive number must be less than 10");
+			
+			stack.push(num);
 		} else if (operand == "+" || operand == "-" || operand == "*" || operand == "/") {
 			if (stack.size() < 2)
 				throw std::runtime_error("Error: Invalid expression");
